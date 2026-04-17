@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign In</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #0d1117;
+      color: #e6edf3;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .card {
+      background: #161b22;
+      border: 1px solid #30363d;
+      border-radius: 12px;
+      padding: 40px;
+      width: 100%;
+      max-width: 360px;
+    }
+    .logo {
+      text-align: center;
+      font-size: 2rem;
+      margin-bottom: 8px;
+    }
+    h1 {
+      text-align: center;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #e6edf3;
+      margin-bottom: 28px;
+    }
+    .flash {
+      background: rgba(244,67,54,0.1);
+      border: 1px solid rgba(244,67,54,0.3);
+      color: #f44336;
+      border-radius: 6px;
+      padding: 10px 14px;
+      font-size: 0.82rem;
+      margin-bottom: 16px;
+    }
+    label {
+      display: block;
+      font-size: 0.78rem;
+      color: #8b949e;
+      margin-bottom: 5px;
+    }
+    input[type=text], input[type=password] {
+      width: 100%;
+      background: #21262d;
+      border: 1px solid #30363d;
+      border-radius: 6px;
+      color: #e6edf3;
+      font-size: 0.9rem;
+      padding: 9px 12px;
+      margin-bottom: 16px;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    input:focus { border-color: #58a6ff; }
+    button {
+      width: 100%;
+      background: #238636;
+      border: 1px solid rgba(240,246,252,0.1);
+      border-radius: 6px;
+      color: #fff;
+      font-size: 0.9rem;
+      font-weight: 600;
+      padding: 10px;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    button:hover { background: #2ea043; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="logo">🔐</div>
+    <h1>App Portal — Sign In</h1>
+    {% for msg in get_flashed_messages() %}
+      <div class="flash">{{ msg }}</div>
+    {% endfor %}
+    <form method="POST">
+      <label>Username</label>
+      <input type="text" name="username" autocomplete="username" autofocus required />
+      <label>Password</label>
+      <input type="password" name="password" autocomplete="current-password" required />
+      <button type="submit">Sign In</button>
+    </form>
+  </div>
+</body>
+</html>

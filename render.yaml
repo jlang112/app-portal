@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: app-portal
+    runtime: python
+    buildCommand: pip install -r requirements.txt && python -c "from app import init_db; init_db()"
+    startCommand: gunicorn app:app
+    envVars:
+      - key: FLASK_ENV
+        value: production
+      - key: SECRET_KEY
+        generateValue: true
+      - key: FIREBASE_SA_JSON
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false

@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin — App Portal</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #0d1117; --surface: #161b22; --surface2: #21262d;
+      --border: #30363d; --text: #e6edf3; --muted: #8b949e; --accent: #58a6ff;
+    }
+    body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 28px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .brand { font-size: 1rem; font-weight: 600; }
+    .brand span { color: var(--accent); }
+    .nav-right { display: flex; gap: 10px; font-size: 0.82rem; }
+    .nav-right a {
+      color: var(--muted); text-decoration: none;
+      padding: 5px 12px; border: 1px solid var(--border); border-radius: 6px;
+      transition: color 0.15s, border-color 0.15s;
+    }
+    .nav-right a:hover { color: var(--text); border-color: #555; }
+
+    main { max-width: 1200px; margin: 0 auto; padding: 32px 24px; }
+
+    .flash {
+      background: rgba(88,166,255,0.1); border: 1px solid rgba(88,166,255,0.3);
+      color: var(--accent); border-radius: 6px; padding: 10px 16px;
+      font-size: 0.82rem; margin-bottom: 20px;
+    }
+
+    h2 { font-size: 1rem; font-weight: 600; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+    .section { margin-bottom: 40px; }
+
+    /* ── Cards ── */
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    /* ── Permission matrix ── */
+    .matrix-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+    th, td { padding: 10px 14px; text-align: left; border-bottom: 1px solid var(--border); white-space: nowrap; }
+    th { background: var(--surface2); color: var(--muted); font-weight: 500; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: rgba(255,255,255,0.02); }
+
+    .badge-admin {
+      background: rgba(88,166,255,0.15); border: 1px solid rgba(88,166,255,0.3);
+      color: var(--accent); border-radius: 10px; padding: 1px 8px; font-size: 0.68rem; font-weight: 600;
+    }
+
+    /* ── Toggle switch ── */
+    .toggle-form { display: inline; }
+    .toggle {
+      position: relative; display: inline-block; width: 36px; height: 20px; cursor: pointer;
+    }
+    .toggle input { opacity: 0; width: 0; height: 0; }
+    .slider {
+      position: absolute; inset: 0;
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 20px; transition: 0.2s;
+    }
+    .slider::before {
+      content: ""; position: absolute;
+      height: 14px; width: 14px; left: 2px; bottom: 2px;
+      background: var(--muted); border-radius: 50%; transition: 0.2s;
+    }
+    .toggle input:checked + .slider { background: rgba(35,134,54,0.4); border-color: #2ea043; }
+    .toggle input:checked + .slider::before { transform: translateX(16px); background: #2ea043; }
+
+    /* ── Forms ── */
+    .form-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: flex-end; padding: 16px; border-bottom: 1px solid var(--border); }
+    .form-group { display: flex; flex-direction: column; gap: 4px; }
+    .form-group label { font-size: 0.72rem; color: var(--muted); }
+    input[type=text], input[type=password], input[type=url] {
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 6px; color: var(--text); font-size: 0.85rem;
+      padding: 7px 10px; outline: none; transition: border-color 0.15s;
+    }
+    input:focus { border-color: var(--accent); }
+    input[type=text].wide { width: 180px; }
+    input[type=password].wide { width: 160px; }
+    input[type=url].wide { width: 240px; }
+    input[type=text].narrow { width: 80px; }
+
+    .btn {
+      padding: 7px 14px; border-radius: 6px; font-size: 0.82rem; font-weight: 600;
+      cursor: pointer; border: 1px solid; transition: all 0.15s;
+    }
+    .btn-green { background: #238636; border-color: rgba(240,246,252,0.1); color: #fff; }
+    .btn-green:hover { background: #2ea043; }
+    .btn-red { background: rgba(244,67,54,0.1); border-color: rgba(244,67,54,0.3); color: #f44336; }
+    .btn-red:hover { background: rgba(244,67,54,0.2); }
+    .btn-blue { background: rgba(88,166,255,0.1); border-color: rgba(88,166,255,0.3); color: var(--accent); }
+    .btn-blue:hover { background: rgba(88,166,255,0.2); }
+
+    .check-label { display: flex; align-items: center; gap: 6px; font-size: 0.82rem; cursor: pointer; }
+    .check-label input { width: 15px; height: 15px; }
+
+    .inline-form { display: inline; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="brand">⚙ Admin <span>Panel</span></div>
+  <div class="nav-right">
+    <a href="/dashboard">← Dashboard</a>
+    <a href="/logout">Sign out</a>
+  </div>
+</header>
+
+<main>
+  {% for msg in get_flashed_messages() %}
+    <div class="flash">{{ msg }}</div>
+  {% endfor %}
+
+  <!-- ── Permission Matrix ─────────────────────────────────────────────── -->
+  <div class="section">
+    <h2>👥 User Access Control</h2>
+    <div class="panel">
+      <div class="matrix-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>User</th>
+              {% for a in apps %}
+                <th>{{ a.icon }} {{ a.name }}</th>
+              {% endfor %}
+              <th>Password</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for u in users %}
+            <tr>
+              <td>
+                {{ u.username }}
+                {% if u.is_admin %}<span class="badge-admin">admin</span>{% endif %}
+              </td>
+
+              {% for a in apps %}
+              <td>
+                <form class="toggle-form" method="POST" action="/admin/permission">
+                  <input type="hidden" name="user_id" value="{{ u.id }}" />
+                  <input type="hidden" name="app_id"  value="{{ a.id }}" />
+                  <label class="toggle">
+                    {% set has_perm = (u.id, a.id) in perms %}
+                    <input type="checkbox"
+                           name="action" value="{{ 'revoke' if has_perm else 'grant' }}"
+                           {% if has_perm %}checked{% endif %}
+                           onchange="this.form.submit()" />
+                    <span class="slider"></span>
+                  </label>
+                </form>
+              </td>
+              {% endfor %}
+
+              <!-- Change password -->
+              <td>
+                <form class="inline-form" method="POST" action="/admin/user/{{ u.id }}/password" style="display:flex;gap:6px;align-items:center">
+                  <input type="password" name="password" placeholder="New password" class="wide" style="width:130px" required />
+                  <button class="btn btn-blue" type="submit">Set</button>
+                </form>
+              </td>
+
+              <!-- Delete -->
+              <td>
+                {% if not u.is_admin or users|selectattr('is_admin')|list|length > 1 %}
+                <form class="inline-form" method="POST" action="/admin/user/{{ u.id }}/delete"
+                      onsubmit="return confirm('Delete user {{ u.username }}?')">
+                  <button class="btn btn-red" type="submit">Delete</button>
+                </form>
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Create user form -->
+      <form method="POST" action="/admin/user/create" class="form-row">
+        <div class="form-group">
+          <label>Username</label>
+          <input type="text" name="username" placeholder="e.g. john@email.com" class="wide" required />
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" name="password" placeholder="Temporary password" class="wide" required />
+        </div>
+        <div class="form-group" style="justify-content:flex-end;padding-bottom:2px">
+          <label class="check-label">
+            <input type="checkbox" name="is_admin" /> Admin
+          </label>
+        </div>
+        <button class="btn btn-green" type="submit">+ Add User</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ── App Registry ───────────────────────────────────────────────────── -->
+  <div class="section">
+    <h2>📦 Registered Apps</h2>
+    <div class="panel">
+      <table>
+        <thead>
+          <tr><th>Icon</th><th>Name</th><th>URL</th><th>Description</th><th></th></tr>
+        </thead>
+        <tbody>
+          {% for a in apps %}
+          <tr>
+            <td style="font-size:1.4rem">{{ a.icon }}</td>
+            <td style="font-weight:600">{{ a.name }}</td>
+            <td><a href="{{ a.url }}" target="_blank" style="color:var(--accent);font-size:0.78rem">{{ a.url }}</a></td>
+            <td style="color:var(--muted);font-size:0.78rem">{{ a.description }}</td>
+            <td>
+              <form class="inline-form" method="POST" action="/admin/app/{{ a.id }}/delete"
+                    onsubmit="return confirm('Remove {{ a.name }} from the portal?')">
+                <button class="btn btn-red" type="submit">Remove</button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+      <!-- Add app form -->
+      <form method="POST" action="/admin/app/create" class="form-row">
+        <div class="form-group">
+          <label>Icon (emoji)</label>
+          <input type="text" name="icon" placeholder="🔧" class="narrow" />
+        </div>
+        <div class="form-group">
+          <label>App Name</label>
+          <input type="text" name="name" placeholder="My App" class="wide" required />
+        </div>
+        <div class="form-group">
+          <label>URL</label>
+          <input type="url" name="url" placeholder="https://myapp.com" class="wide" required />
+        </div>
+        <div class="form-group">
+          <label>Description</label>
+          <input type="text" name="description" placeholder="Short description" style="width:220px" />
+        </div>
+        <button class="btn btn-green" type="submit">+ Add App</button>
+      </form>
+    </div>
+  </div>
+
+</main>
+</body>
+</html>

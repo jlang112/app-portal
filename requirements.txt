@@ -1,0 +1,6 @@
+flask
+flask-login
+werkzeug
+python-dotenv
+firebase-admin
+gunicorn
