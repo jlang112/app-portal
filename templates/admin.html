@@ -220,15 +220,40 @@
         </thead>
         <tbody>
           {% for a in apps %}
-          <tr>
+          <tr id="app-row-{{ a.id }}">
             <td style="font-size:1.4rem">{{ a.icon }}</td>
             <td style="font-weight:600">{{ a.name }}</td>
             <td><a href="{{ a.url }}" target="_blank" style="color:var(--accent);font-size:0.78rem">{{ a.url }}</a></td>
             <td style="color:var(--muted);font-size:0.78rem">{{ a.description }}</td>
-            <td>
+            <td style="display:flex;gap:6px">
+              <button class="btn btn-blue" onclick="toggleEdit({{ a.id }})">Edit</button>
               <form class="inline-form" method="POST" action="/admin/app/{{ a.id }}/delete"
                     onsubmit="return confirm('Remove {{ a.name }} from the portal?')">
                 <button class="btn btn-red" type="submit">Remove</button>
+              </form>
+            </td>
+          </tr>
+          <tr id="app-edit-{{ a.id }}" style="display:none;background:var(--surface2)">
+            <td colspan="5">
+              <form method="POST" action="/admin/app/{{ a.id }}/edit" style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;padding:8px 4px">
+                <div class="form-group">
+                  <label>Icon</label>
+                  <input type="text" name="icon" value="{{ a.icon }}" class="narrow" />
+                </div>
+                <div class="form-group">
+                  <label>Name</label>
+                  <input type="text" name="name" value="{{ a.name }}" class="wide" required />
+                </div>
+                <div class="form-group">
+                  <label>URL</label>
+                  <input type="url" name="url" value="{{ a.url }}" style="width:280px" required />
+                </div>
+                <div class="form-group">
+                  <label>Description</label>
+                  <input type="text" name="description" value="{{ a.description }}" style="width:200px" />
+                </div>
+                <button class="btn btn-green" type="submit">Save</button>
+                <button class="btn" type="button" onclick="toggleEdit({{ a.id }})" style="border-color:var(--border);color:var(--muted)">Cancel</button>
               </form>
             </td>
           </tr>
@@ -260,5 +285,11 @@
   </div>
 
 </main>
+<script>
+  function toggleEdit(id) {
+    const row = document.getElementById('app-edit-' + id);
+    row.style.display = row.style.display === 'none' ? 'table-row' : 'none';
+  }
+</script>
 </body>
 </html>

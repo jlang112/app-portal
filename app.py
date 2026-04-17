@@ -324,6 +324,25 @@ def create_app():
     return redirect(url_for("admin"))
 
 
+@app.route("/admin/app/<int:app_id>/edit", methods=["POST"])
+@login_required
+@admin_required
+def edit_app(app_id):
+    name = request.form.get("name", "").strip()
+    url  = request.form.get("url", "").strip()
+    icon = request.form.get("icon", "🔧").strip() or "🔧"
+    desc = request.form.get("description", "").strip()
+    if not name or not url:
+        flash("Name and URL are required")
+        return redirect(url_for("admin"))
+    get_db().execute(
+        "UPDATE apps SET name=?, url=?, icon=?, description=? WHERE id=?",
+        (name, url, icon, desc, app_id)
+    )
+    flash(f"App '{name}' updated")
+    return redirect(url_for("admin"))
+
+
 @app.route("/admin/app/<int:app_id>/delete", methods=["POST"])
 @login_required
 @admin_required
