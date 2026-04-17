@@ -112,7 +112,7 @@ def init_db():
             db.executemany(
                 "INSERT INTO apps (name, url, icon, description, sort_order) VALUES (?,?,?,?,?)",
                 [
-                    ("Stock Signal Analyzer",  "http://localhost:5000",                    "📈",
+                    ("Stock Signal Analyzer",  "https://stock-signal-analyzer.onrender.com", "📈",
                      "Real-time stock scoring across technical, news, social & analyst signals", 1),
                     ("Self Storage Valuation", "https://self-storage-valuation.web.app",   "🏗️",
                      "Self-storage property appraisal and valuation tool",                    2),
