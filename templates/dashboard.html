@@ -109,7 +109,7 @@
   <div class="app-grid">
     {% if apps %}
       {% for app in apps %}
-        <a class="app-card" href="{{ app.url }}" target="_blank" rel="noopener">
+        <a class="app-card" href="/launch/{{ app.id }}" target="_blank" rel="noopener">
           <div class="app-icon">{{ app.icon }}</div>
           <div class="app-name">{{ app.name }}</div>
           {% if app.description %}

@@ -4,6 +4,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 import sqlite3, os
 from functools import wraps
 from dotenv import load_dotenv
+from itsdangerous import URLSafeTimedSerializer, BadSignature, SignatureExpired
 
 load_dotenv(".env")
 
@@ -15,6 +16,8 @@ login_manager.login_view = "login"
 login_manager.login_message = ""
 
 DB = "portal.db"
+PORTAL_SECRET = os.getenv("PORTAL_SECRET", "dev-secret-change-in-production")
+_signer = URLSafeTimedSerializer(PORTAL_SECRET, salt="app-launch")
 
 # ── Firebase Admin (optional — only if credentials exist) ──────────────────────
 _firebase_ready = False
@@ -211,6 +214,30 @@ def dashboard():
             ORDER BY a.sort_order, a.name
         """, (current_user.id,)).fetchall()
     return render_template("dashboard.html", apps=apps)
+
+
+# ── Routes: App Launch ────────────────────────────────────────────────────────
+
+@app.route("/launch/<int:app_id>")
+@login_required
+def launch_app(app_id):
+    row = get_db().execute("SELECT * FROM apps WHERE id=? AND is_active=1", (app_id,)).fetchone()
+    if not row:
+        return redirect(url_for("dashboard"))
+
+    # Check user has permission (admins always allowed)
+    if not current_user.is_admin:
+        perm = get_db().execute(
+            "SELECT 1 FROM permissions WHERE user_id=? AND app_id=?",
+            (current_user.id, app_id)
+        ).fetchone()
+        if not perm:
+            return redirect(url_for("dashboard"))
+
+    # Generate signed token valid for 1 hour
+    token = _signer.dumps(current_user.username)
+    url = row["url"].rstrip("/")
+    return redirect(f"{url}/?pt={token}")
 
 
 # ── Routes: Admin ─────────────────────────────────────────────────────────────

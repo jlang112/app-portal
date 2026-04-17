@@ -4,3 +4,4 @@ werkzeug
 python-dotenv
 firebase-admin
 gunicorn
+itsdangerous
