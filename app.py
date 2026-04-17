@@ -14,10 +14,6 @@ login_manager = LoginManager(app)
 login_manager.login_view = "login"
 login_manager.login_message = ""
 
-# Run on every startup regardless of how the app is launched (gunicorn or direct)
-with app.app_context():
-    init_db()
-
 DB = "portal.db"
 
 # ── Firebase Admin (optional — only if credentials exist) ──────────────────────
@@ -338,6 +334,10 @@ def delete_app(app_id):
         flash(f"App '{row['name']}' removed")
     return redirect(url_for("admin"))
 
+
+# Run on every startup regardless of how the app is launched (gunicorn or direct)
+with app.app_context():
+    init_db()
 
 if __name__ == "__main__":
     port = int(os.getenv("PORT", 5050))
